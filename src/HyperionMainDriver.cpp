@@ -118,7 +118,7 @@ void HyperionMainDriver::load_mesh()
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   m_mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-
+  m_mesh->SetPoints(points);
   int nb_cells_to_allocate = 0;
   {
     std::vector<std::size_t> cells;
@@ -147,8 +147,11 @@ void HyperionMainDriver::load_mesh()
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Write code here
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    m_mesh.InsertNextCell(MSH_QUAD_4, nodes[c * 4]);
+    std::array<vtkIdType,4> tmp_points;
+    for (int i = 0; i < 4; ++i){
+      tmp_points[i] = nodes[c * 4 + i] - 1;
+    }
+    m_mesh.InsertNextCell(MSH_QUAD_4, tmp_points.data());
   }
 
   gmsh::finalize();
