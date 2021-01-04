@@ -101,15 +101,23 @@ void HyperionMainDriver::load_mesh()
   // TODO : write code here
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  auto points = vtkSmartPointer<vtkPoints>::New();
+
   // Insert points from Gmsh node coordinates
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // TODO : write code here
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  for (int n = 0; n < nodes.size(); ++n) {
+    points->InsertPoint(nodes[n] - 1, coords[n * 3 + 0], coords[n * 3 + 1], coords[n * 3 + 2]);
+  }
+
   // Create a VTK unstructured grid
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // TODO : write code here
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  m_mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
 
   int nb_cells_to_allocate = 0;
   {
@@ -124,6 +132,8 @@ void HyperionMainDriver::load_mesh()
   // TODO : write code here
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  m_mesh.allocate(nb_cells_to_allocate);
+
   // Get global cells and nodes
   nodes.clear();
   std::vector<std::size_t> cells;
@@ -137,6 +147,8 @@ void HyperionMainDriver::load_mesh()
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Write code here
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    m_mesh.InsertNextCell(MSH_QUAD_4, nodes[c * 4]);
   }
 
   gmsh::finalize();
