@@ -139,23 +139,11 @@ void HyperionMainDriver::load_mesh()
     m_msh_vtk_cells[cells[c]] = c;
     m_vtk_msh_cells[c] = cells[c];
 
-<<<<<<< HEAD
-    // Insert connectivites, i.e. nodes connected to a cell
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Write code here
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    std::array<vtkIdType,4> tmp_points;
-    for (int i = 0; i < 4; ++i){
-      tmp_points[i] = nodes[c * 4 + i] - 1;
-    }
-    m_mesh.InsertNextCell(MSH_QUAD_4, tmp_points.data());
-=======
     vtkNew<vtkIdList> cell_nodes;
     for (int n = 0; n < 4; ++n) {
       cell_nodes->InsertNextId(nodes[c * 4 + n] - 1);
     }
     m_mesh->InsertNextCell(VTK_QUAD, cell_nodes);
->>>>>>> 6790916501bab76ef8ef0cdaacdace45fb144ef7
   }
 
   gmsh::finalize();
@@ -190,7 +178,11 @@ int HyperionMainDriver::run()
 
     bool last_iteration = (simulation_time == final_time + hydro->dt());
     // TODO: if ANALYZE_INSITU, then call the appropriate method, else call dump
-
+    #ifdef ANALYZE_INSITU
+    hydro->analyze_insitu(simulation_time, step, last_iteration);
+    #else
+    hydro->dump(step, simulation_time);
+    #endif
     hydro->compute_pressure_force();
     hydro->compute_artificial_viscosity();
     hydro->compute_velocity();
